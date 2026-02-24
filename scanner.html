@@ -470,7 +470,7 @@
     // 4. LISTEN FOR ACK FROM GAS PARENT WINDOW
     //GAS window যখন data receive করবে, সে acknowledge পাঠাব
     // ============================================================
-    window.addEventListener('message', function(event) { }
+    window.addEventListener('message', function(event) {
 
       const data = event.data;
       if (!data || data.type !== 'HAJIRA_ACK') return;
