@@ -468,29 +468,31 @@
 
     // ============================================================
     // 4. LISTEN FOR ACK FROM GAS PARENT WINDOW
-    //    GAS window যখন data receive করবে, সে acknowledge পাঠাবে
+    //GAS window যখন data receive করবে, সে acknowledge পাঠাব
     // ============================================================
     window.addEventListener('message', function(event) {
-      // Origin check: শুধু GAS origin থেকে আসা message accept করবো
       if (!ALLOWED_ORIGINS.includes(event.origin)) {
-        console.warn('Ignored message from unknown origin:', event.origin);
         return;
       }
 
       const data = event.data;
       if (!data || data.type !== 'HAJIRA_ACK') return;
 
-      // GAS confirmed receipt
       ackReceived = true;
       clearTimeout(ackTimer);
       document.getElementById('overlay').classList.remove('show');
 
       if (data.status === 'saving') {
-        // GAS গ্রহণ করেছে এবং save করছে
-        showToast('✅ Data received by GAS! Saving...');
-        setTimeout(() => window.close(), 2500);
+        showToast('✅ Saved Successfully!');
+        setTimeout(() => window.close(), 1500);
       } else if (data.status === 'error') {
-        showToast('❌ GAS Error: ' + (data.message || 'Unknown'));
+        // ★ ডুপ্লিকেট বা এরর হলে স্ক্যানার উইন্ডোতেই এলার্ট দেখাবে এবং বাটন আবার এনাবল করবে
+        alert(data.message);
+        document.getElementById('live-txt').textContent = 'READY';
+        document.getElementById('btn-finish').disabled = false;
+        
+        // চাইলে স্ক্যান করা লিস্ট ক্লিয়ার করে দিতে পারেন
+        // clearAll(); 
       }
     });
 
