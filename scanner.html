@@ -138,7 +138,15 @@
     // ============================================================
     window.addEventListener('message', function(event) {
       const data = event.data;
-      if (!data || data.type !== 'HAJIRA_ACK') return;
+      if (!data) return;
+
+      // ★ নতুন সমাধান: মূল অ্যাপ থেকে স্টুডেন্ট আইডি রিসিভ করা
+      if (data.type === 'SET_VALID_IDS' && Array.isArray(data.ids)) {
+          data.ids.forEach(id => validIds.add(String(id).trim()));
+          return;
+      }
+
+      if (data.type !== 'HAJIRA_ACK') return;
 
       // When GAS confirms it received the request and is processing
       if (data.status === 'processing') {
