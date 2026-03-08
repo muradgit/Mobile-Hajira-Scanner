@@ -154,7 +154,7 @@
          document.getElementById('overlay-msg').textContent = 'SAVING TO DATABASE';
          document.getElementById('overlay-sub').textContent = 'Please wait, checking duplicates...';
          // Set a new longer timer just in case DB gets stuck
-         ackTimer = setTimeout(showFallback, 15000); 
+         ackTimer = setTimeout(showFallback, 90000); 
       }
       // When GAS successfully saves
       else if (data.status === 'saving') {
@@ -240,8 +240,8 @@
       if (window.opener && !window.opener.closed) {
         try {
           window.opener.postMessage(payload, '*');
-          // Wait 4 seconds for GAS to reply with 'processing'
-          ackTimer = setTimeout(showFallback, 4000); 
+          // ★ প্রথম রেসপন্সের জন্য ১৫ সেকেন্ড (15000 ms) অপেক্ষা করবে
+          ackTimer = setTimeout(showFallback, 15000); 
         } catch(e) { document.getElementById('overlay').classList.remove('show'); showFallback(); }
       } else {
         document.getElementById('overlay').classList.remove('show'); showFallback();
