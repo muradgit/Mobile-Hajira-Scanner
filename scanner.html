@@ -160,9 +160,15 @@
       else if (data.status === 'saving') {
          clearTimeout(ackTimer);
          document.getElementById('overlay').classList.remove('show');
-         showToast('✅ Saved Successfully!', 'success', 'bi-check-circle-fill');
-         setTimeout(() => window.close(), 1000);
+         
+         // ★ ডাইনামিক মেসেজ তৈরি
+         const countText = data.count ? data.count + ' ' : '';
+         showToast(`✅ Saved ${countText}Students Successfully!`, 'success', 'bi-check-circle-fill');
+         
+         // মেসেজটি পড়ার জন্য দেড় সেকেন্ড (1500ms) সময় দিয়ে তারপর উইন্ডো ক্লোজ করবে
+         setTimeout(() => window.close(), 1500); 
       }
+      
       // When GAS encounters an error (like Duplicate)
       else if (data.status === 'error') {
          clearTimeout(ackTimer);
