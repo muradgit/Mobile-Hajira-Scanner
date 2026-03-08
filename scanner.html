@@ -133,8 +133,8 @@
     let scannedBatch = [], invalidCount = 0, dupCount = 0, scanner = null, lastCode = '', lastTime = 0;
     let ackTimer = null;
 
-    // ============================================================
-    // 1. DUAL ACKNOWLEDGE LISTENER (No Origin Blocking)
+    /*/ ============================================================
+    // 1. DUAL ACKNOWLEDGE LISTENER (No Origin Blocking). দরকার নেই। যেহেতু আর চেক করতে হচ্ছেনা।
     // ============================================================
     window.addEventListener('message', function(event) {
       const data = event.data;
@@ -179,7 +179,9 @@
          document.getElementById('live-dot').className = 'spinner-grow text-danger';
          document.getElementById('btn-finish').disabled = false;
       }
-    });
+    });*/
+
+    
 
     // ============================================================
     // 2. CAMERA INIT
@@ -215,9 +217,9 @@
       updateCounters(); addLogItem(id); setStatus('alert-success', 'bi-check-circle-fill text-success', 'Scanned: ' + id); vibrate([40]);
     }
 
-    // ============================================================
+    /*/ ============================================================
     // 3. FINISH SCAN & SEND TO GAS
-    // ============================================================
+    // এটা আপডেট করা হয়েছে
     function finishScan() {
       if (scannedBatch.length === 0) return alert('No students scanned!');
       if (!confirm(`Save attendance for ${scannedBatch.length} student(s)?\n\nTeacher: ${ctx.teacher}\nSubject: ${ctx.subject}\nCost: 2 Credits`)) return;
@@ -245,6 +247,37 @@
         } catch(e) { document.getElementById('overlay').classList.remove('show'); showFallback(); }
       } else {
         document.getElementById('overlay').classList.remove('show'); showFallback();
+      }
+    }*/
+
+    // ============================================================
+    // 3. FINISH SCAN & INSTANT CLOSE
+    // ============================================================
+    function finishScan() {
+      if (scannedBatch.length === 0) return alert('No students scanned!');
+      if (!confirm(`Save attendance for ${scannedBatch.length} student(s)?`)) return;
+
+      try { scanner.stop(); } catch(e) {}
+      document.getElementById('scan-line').style.display = 'none';
+      
+      const btn = document.getElementById('btn-finish');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Returning to App...';
+
+      const payload = {
+        type: 'HAJIRA_SCAN_DATA', students: scannedBatch.slice(), teacher: ctx.teacher, level: ctx.level, deptGroup: ctx.deptGroup, session: ctx.session, subjectName: ctx.subject, classYear: ctx.classYear
+      };
+
+      if (window.opener && !window.opener.closed) {
+        try {
+          // ডাটা মূল অ্যাপে পাঠানো হলো
+          window.opener.postMessage(payload, '*');
+          
+          // ★ ডাটা পাঠানোর সাথে সাথেই স্ক্যানার অটোমেটিক ক্লোজ হয়ে যাবে
+          setTimeout(() => { window.close(); }, 300);
+        } catch(e) { showFallback(); }
+      } else {
+        showFallback();
       }
     }
 
