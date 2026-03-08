@@ -133,53 +133,17 @@
     let scannedBatch = [], invalidCount = 0, dupCount = 0, scanner = null, lastCode = '', lastTime = 0;
     let ackTimer = null;
 
-    /*/ ============================================================
-    // 1. DUAL ACKNOWLEDGE LISTENER (No Origin Blocking). দরকার নেই। যেহেতু আর চেক করতে হচ্ছেনা।
+    // ============================================================
+    // 1. HANDSHAKE LISTENER (মূল অ্যাপ থেকে আইডি রিসিভ করার জন্য)
     // ============================================================
     window.addEventListener('message', function(event) {
       const data = event.data;
       if (!data) return;
 
-      // ★ নতুন সমাধান: মূল অ্যাপ থেকে স্টুডেন্ট আইডি রিসিভ করা
       if (data.type === 'SET_VALID_IDS' && Array.isArray(data.ids)) {
           data.ids.forEach(id => validIds.add(String(id).trim()));
-          return;
       }
-
-      if (data.type !== 'HAJIRA_ACK') return;
-
-      // When GAS confirms it received the request and is processing
-      if (data.status === 'processing') {
-         clearTimeout(ackTimer); // Stop the "Auto Send Failed" timer
-         document.getElementById('overlay-msg').textContent = 'SAVING TO DATABASE';
-         document.getElementById('overlay-sub').textContent = 'Please wait, checking duplicates...';
-         // Set a new longer timer just in case DB gets stuck
-         ackTimer = setTimeout(showFallback, 90000); 
-      }
-      // When GAS successfully saves
-      else if (data.status === 'saving') {
-         clearTimeout(ackTimer);
-         document.getElementById('overlay').classList.remove('show');
-         
-         // ★ ডাইনামিক মেসেজ তৈরি
-         const countText = data.count ? data.count + ' ' : '';
-         showToast(`✅ Saved ${countText}Students Successfully!`, 'success', 'bi-check-circle-fill');
-         
-         // মেসেজটি পড়ার জন্য দেড় সেকেন্ড (1500ms) সময় দিয়ে তারপর উইন্ডো ক্লোজ করবে
-         setTimeout(() => window.close(), 1500); 
-      }
-      
-      // When GAS encounters an error (like Duplicate)
-      else if (data.status === 'error') {
-         clearTimeout(ackTimer);
-         document.getElementById('overlay').classList.remove('show');
-         alert('❌ Error: ' + data.message);
-         document.getElementById('live-txt').textContent = 'ERROR';
-         document.getElementById('live-txt').className = 'fw-bold text-danger';
-         document.getElementById('live-dot').className = 'spinner-grow text-danger';
-         document.getElementById('btn-finish').disabled = false;
-      }
-    });*/
+    });
 
     
 
